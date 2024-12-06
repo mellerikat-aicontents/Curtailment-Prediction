@@ -1,5 +1,3 @@
-# Curtailment-Prediction
-=======
 # 📖Solution
 
 ## 🔋🔌Curtailment Prediction(CP)🪫
