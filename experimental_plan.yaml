@@ -1,0 +1,66 @@
+name: energy_power_limit
+
+# ALO API 활용시 경로
+external_path:
+    - load_train_data_path: ./solution/sample_data/train
+    - load_inference_data_path: ./solution/sample_data/inference
+    - save_train_artifacts_path:
+    - save_inference_artifacts_path:
+    - load_model_path:
+
+version: 1.0.0
+
+external_path_permission:
+    - aws_key_profile:
+
+user_parameters:
+    - train_pipeline:
+      - step: train
+        args:
+          - data_dir: '/path/to/dataset/'
+            random_state: 0
+            file_name: 'train'
+            x_columns: ['HVDC', '풍력(MWh)', '태양광(MWh)', '중유(MWh)', '경유(MWh)', '바이오중유(MWh)', 'demand']
+            y_columns: ['발전제한량']
+            target: '발전제한량'
+            train_ratio: 0.6
+
+
+    - inference_pipeline:
+      - step: inference
+        args:
+          - data_dir: '/path/to/dataset/'
+            file_name: 'inference'
+            x_columns: ['HVDC', '풍력(MWh)', '태양광(MWh)', '중유(MWh)', '경유(MWh)', '바이오중유(MWh)', 'demand']
+            y_columns: ['발전제한량']
+            model_file: 'best_model.joblib'
+
+
+asset_source:
+    - train_pipeline:
+      - step: train
+        source:
+          code: local
+          branch:
+          requirements:
+            - requirements.txt
+
+    - inference_pipeline:
+      - step: inference
+        source:
+          code: local
+          branch:
+          requirements:
+            - requirements.txt
+
+
+control:
+    - get_asset_source: once ## once, every
+    - backup_artifacts: True
+    - backup_log: True
+    - backup_size: 1000
+    - interface_mode: memory
+    - save_inference_format: tar.gz
+    - check_resource: False
+
+ui_args_detail:
